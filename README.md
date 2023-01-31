@@ -1,41 +1,117 @@
 <html>
   <head>
-    <title>Custom VPC in AWS</title>
+    <title>Custom VPC Creation in AWS using Boto3</title>
   </head>
   <body>
-    <h1>Custom VPC in AWS</h1>
-    <p>This tutorial will guide you through the process of creating a custom Virtual Private Cloud (VPC) in Amazon Web Services (AWS).</p>
-    <h2>Step 1: Log into AWS Console</h2>
-    <p>To start, log into the AWS Console using your AWS account credentials.</p>
-    <img src="https://aws.amazon.com/images/aws-console.png" alt="AWS Console Login">
-    <h2>Step 2: Navigate to the VPC Dashboard</h2>
-    <p>Once logged in, navigate to the VPC Dashboard by clicking on the VPC link under the Networking & Content Delivery section of the AWS Management Console.</p>
-    <img src="https://aws.amazon.com/images/vpc-dashboard.png" alt="VPC Dashboard">
-    <h2>Step 3: Create a New VPC</h2>
-    <p>Click on the Create VPC button to create a new VPC. Enter a name for the VPC and select the IPv4 CIDR block for the VPC. In this example, we are using 10.0.0.0/16 as the CIDR block.</p>
-    <img src="https://aws.amazon.com/images/create-vpc.png" alt="Create VPC">
-    <h2>Step 4: Create Subnets</h2>
-    <p>Create subnets within the VPC by clicking on the Subnets link in the navigation panel and then clicking on the Create Subnet button. Enter a name for the subnet and select the VPC you just created from the VPC dropdown menu. Select the Availability Zone for the subnet and enter the IPv4 CIDR block for the subnet.</p>
-    <img src="https://aws.amazon.com/images/create-subnet.png" alt="Create Subnet">
-    <h2>Step 5: Create a Route Table</h2>
-    <p>Create a route table for the VPC by clicking on the Route Tables link in the navigation panel and then clicking on the Create Route Table button. Enter a name for the route table and select the VPC you just created from the VPC dropdown menu.</p>
-    <img src="https://aws.amazon.com/images/create-route-table.png" alt="Create Route Table">
-    <h2>Step 6: Add a Default Route</h2>
-    <p>Add a default route to the route table by clicking on the Routes tab, clicking on the Edit button, and then clicking on the Add another route button. Enter 0.0.0.0/0 as the destination and select the Internet Gateway that you created earlier as the target.</p>
-    <img src="https://aws.amazon.com/images/add-default-route.png" alt="Add Default Route">
-    <h2>Step 7: Associate the Subnets with the Route Table</h2>
-    <p>Associate the subnets with the route table by selecting the subnets from the Subnet Associations tab and clicking on the Edit button. Select the route table you just created from the Route Table dropdown menu and click on the Savebutton to complete the association.</p>
-<img src="https://aws.amazon.com/images/associate-subnets-route-table.png" alt="Associate Subnets with Route Table">
-<h2>Step 8: Create an Internet Gateway</h2>
-<p>Create an Internet Gateway by clicking on the Internet Gateways link in the navigation panel and then clicking on the Create Internet Gateway button. Enter a name for the Internet Gateway and click on the Yes, Create button to complete the process.</p>
-<img src="https://aws.amazon.com/images/create-internet-gateway.png" alt="Create Internet Gateway">
-<h2>Step 9: Attach the Internet Gateway to the VPC</h2>
-<p>Attach the Internet Gateway to the VPC by selecting the Internet Gateway from the list and clicking on the Attach to VPC button. Select the VPC you created earlier from the VPC dropdown menu and click on the Yes, Attach button to complete the process.</p>
-<img src="https://aws.amazon.com/images/attach-internet-gateway-to-vpc.png" alt="Attach Internet Gateway to VPC">
+    <h1>Custom VPC Creation in AWS using Boto3</h1>
+    <h2>Introduction</h2>
+    <p>This tutorial will guide you through the process of creating a custom Virtual Private Cloud (VPC) in Amazon Web Services (AWS) using the Boto3 Python library.</p>
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>An AWS account</li>
+      <li>Boto3 library installed in your system</li>
+    </ul>
+    <h2>Step 1: Import the Boto3 Library</h2>
+    <p>To start, you'll need to import the Boto3 library in your Python script:</p>
+    <pre>
+import boto3
+    </pre>
+    <h2>Step 2: Create a Boto3 Client for EC2</h2>
+    <p>Next, create a Boto3 client for EC2:</p>
+    <pre>
+ec2 = boto3.client('ec2')
+    </pre>
+    <h2>Step 3: Define the CIDR Block for the VPC</h2>
+    <p>Define the CIDR block for the VPC:</p>
+    <pre>
+vpc_cidr = '10.0.0.0/16'
+    </pre>
+    <h2>Step 4: Create the VPC</h2>
+    <p>Create the VPC using the following code:</p>
+    <pre>
+response = ec2.create_vpc(
+    CidrBlock=vpc_cidr
+)
+    </pre>
+    <h2>Step 5: Get the VPC ID</h2>
+    <p>Get the VPC ID:</p>
+    <pre>
+vpc_id = response['Vpc']['VpcId']
+    </pre>
+    <h2>Step 6: Create a Subnet within the VPC</h2>
+    <p>Create a subnet within the VPC:</p>
+    <pre>
+response = ec2.create_subnet(
+    VpcId=vpc_id,
+    CidrBlock='10.0.0.0/24',
+    AvailabilityZone='us-west-2a'
+)
+    </pre>
+    <h2>Step 7: Get the Subnet ID</h2>
+    <p>Get the Subnet ID:</p>
+    <pre>
+subnet_id = response['Subnet']['SubnetId']
+    </pre>
+    <h2>Step 8: Create an Internet Gateway</h2>
+    <p>Create an Internet Gateway:</p>
+    <pre>
+response = ec2.create_internet_gateway()
+    </pre>
+    <h2>Step 9: Get the Internet Gateway ID</h2>
+    <p>Get the Internet Gateway ID:</p>
+    <pre>
+internet_gateway_id = response['InternetGateway']['InternetGatewayId']
+</pre>
+<h2>Step 10: Attach the Internet Gateway to the VPC</h2>
+<p>Attach the Internet Gateway to the VPC:</p>
+<pre>
+response = ec2.attach_internet_gateway(
+InternetGatewayId=internet_gateway_id,
+VpcId=vpc_id
+)
+</pre>
+<h2>Step 11: Create a Route Table</h2>
+<p>Create a Route Table:</p>
+<pre>
+response = ec2.create_route_table(
+VpcId=vpc_id
+)
+</pre>
+<h2>Step 12: Get the Route Table ID</h2>
+<p>Get the Route Table ID:</p>
+<pre>
+route_table_id = response['RouteTable']['RouteTableId']
+</pre>
+<h2>Step 13: Create a Route for the Internet Gateway</h2>
+<p>Create a Route for the Internet Gateway:</p>
+<pre>
+response = ec2.create_route(
+DestinationCidrBlock='0.0.0.0/0',
+GatewayId=internet_gateway_id,
+RouteTableId=route_table_id
+)
+</pre>
+<h2>Step 14: Associate the Subnet with the Route Table</h2>
+<p>Associate the Subnet with the Route Table:</p>
+<pre>
+response = ec2.associate_route_table(
+SubnetId=subnet_id,
+RouteTableId=route_table_id
+)
+</pre>
+<h2>Step 15: Launch an EC2 Instance within the VPC</h2>
+<p>Finally, launch an EC2 instance within the VPC:</p>
+<pre>
+response = ec2.run_instances(
+ImageId='ami-0c55b159cbfafe1f0',
+InstanceType='t2.micro',
+MinCount=1,
+MaxCount=1,
+SubnetId=subnet_id
+)
+</pre>
 <h2>Conclusion</h2>
-<p>You have successfully created a custom VPC in AWS. You can now launch instances into your VPC and configure them to use your custom network settings.</p>
+<p>This tutorial has demonstrated how to create a custom VPC in AWS using Boto3. This VPC can be used to host your applications and services in a secure and isolated environment.</p>
 
   </body>
 </html>
-
-
